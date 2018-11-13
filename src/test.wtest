@@ -1,0 +1,144 @@
+import viaje.*
+import Socios.*
+describe "instanciar"{
+	var franco=new SocioTranquilo()
+	var gabriel=new SocioCoherente()
+	var juan=new SocioRelajado()
+	var roque=new Socios()
+	var anna=new Socios()
+	var viajePlaya= new ViajePlaya()
+	var viajePlaya2= new ViajePlaya()
+	var viajeExcusionCiudadTropical=new ExcursionCiudadTropical()
+	var viajeExcusionCiudad=new ExcursionCiudad()		
+	var gim=new Gim()
+	var salida= new SalidaDeTrekking()
+	var taller=new TallerLiterario()
+	var libro1=new Libros()
+	var libro2=new Libros()
+	var libro3=new Libros()
+	fixture {
+	roque.topeActividades(3)
+	anna.topeActividades(3)
+	franco.topeActividades(3)
+	gabriel.topeActividades(4)
+	juan.topeActividades(3)
+	viajePlaya.idioma("ingles")
+	viajePlaya2.idioma("ingles")
+	viajeExcusionCiudadTropical.cantAtracciones(8)
+	viajeExcusionCiudad.cantAtracciones(4)
+	viajePlaya.largoPlaya(1000)
+	viajePlaya2.largoPlaya(2000)
+	viajePlaya.broncearse(true)
+	viajePlaya2.broncearse(true)
+	salida.kms(100)
+	salida.diasSol(130)
+	franco.idiomas("ingles")
+	franco.idiomas("aleman")
+	franco.edad(23)
+	libro1.idioma("ingles")
+	libro2.idioma("español")
+	libro3.idioma("galez")
+	libro1.nombreAutor("Maquiavelo")
+	libro2.nombreAutor("Khafka")
+	libro3.nombreAutor("Guarani")
+	}
+test "playa" {
+	viajePlaya.largoPlaya(1000)
+	assert.equals(false,viajePlaya.haceEsfuerzo())
+	assert.equals(true,viajePlaya.puedeBroncearse())
+	assert.equals(2,viajePlaya.cantDeDias())//<-error
+	
+	}
+test "ExcursionCiudadTropical"{
+	
+	assert.equals(true,viajeExcusionCiudadTropical.haceEsfuerzo())
+	assert.equals(true,viajeExcusionCiudadTropical.puedeBroncearse())
+	assert.equals(5,viajeExcusionCiudadTropical.cantDeDias())//<-error
+	assert.equals(false,viajeExcusionCiudad.haceEsfuerzo())
+	assert.equals(true,viajeExcusionCiudad.puedeBroncearse())
+	assert.equals(2,viajeExcusionCiudad.cantDeDias())//<-error
+	
+}
+test"Salida de trekking"{
+	
+	assert.equals(2,salida.cantDeDias())
+	assert.equals(true,salida.haceEsfuerzo())
+	assert.equals(false,salida.puedeBroncearse())
+}
+test "roque"{
+	roque.actividadesRealizadas(viajePlaya)
+	roque.actividadesRealizadas(viajePlaya2)
+	
+	assert.equals(true,roque.adoradorDelSol())
+	assert.equals([viajePlaya2],roque.actividadesEsforzadas())
+}
+test"roque ERROR"{
+	roque.actividadesRealizadas(viajePlaya)
+	roque.actividadesRealizadas(gim)
+	roque.topeActividades(1)
+	assert.throwsException({roque.actividadesRealizadas(gim)})//No pude hacerlo andar
+	
+}
+	
+test "anna"{
+	anna.actividadesRealizadas(viajePlaya)
+	anna.actividadesRealizadas(viajePlaya2)
+	anna.actividadesRealizadas(gim)
+	anna.cantActividades(0)
+	anna.topeActividades(4)
+	assert.equals(false,anna.adoradorDelSol())//<-DEBERIA SER FALSE PORQUE GIM NO TIENE SOL
+	assert.equals([viajePlaya2,gim],anna.actividadesEsforzadas())//<-Da vacio
+			
+}
+
+test "franco tranquilo"{
+	franco.actividadesRealizadas(viajePlaya)
+	franco.actividadesRealizadas(viajePlaya2)
+	franco.actividadesRealizadas(gim)
+	
+	assert.equals(false,franco.atrae())
+}
+test "gabriel coherente"{
+	
+	gabriel.actividadesRealizadas(viajePlaya)
+	gabriel.actividadesRealizadas(viajePlaya2)
+	gabriel.actividadesRealizadas(gim)
+	
+	assert.equals(false,gabriel.atrae())
+}
+test "juan relajado"{
+	
+	juan.actividadesRealizadas(viajePlaya)
+	juan.actividadesRealizadas(viajePlaya2)
+	juan.actividadesRealizadas(gim)
+	juan.idiomas("español")
+	juan.idiomas("aleman")
+	
+	assert.equals(false,juan.atrae())	
+	
+}
+test "actividadesRecomendadas gim "{
+	franco.edad(23)
+	gabriel.edad(10)
+	juan.edad(25)
+	assert.equals(true,gim.esRecomendada(franco))
+	assert.equals(false,gim.esRecomendada(gabriel))
+	assert.equals(true,gim.esRecomendada(juan))
+	
+}
+test "actividadesRecomendadas taller"{
+		taller.librosQueTrabaja(libro1)
+		taller.librosQueTrabaja(libro2)
+		taller.librosQueTrabaja(libro3)
+		assert.equals(["ingles","español","galez"],taller.idiomasUsados())
+		assert.equals(false,taller.haceEsfuerzo("Maquiavelo"))	
+		assert.equals(true,taller.esRecomendada(franco))
+		assert.equals(4,taller.cantDeDias())
+}
+test "actividadesRecomendadas cualquiera"{
+	assert.equals(false,viajePlaya.esRecomendada(franco,viajePlaya))
+	assert.equals(false,viajePlaya2.esRecomendada(gabriel,viajePlaya2))
+
+	
+}
+}
